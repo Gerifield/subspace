@@ -20,7 +20,7 @@ ENV GODEBUG="netdns=go http2server=0"
 
 RUN make BUILD_VERSION=${BUILD_VERSION}
 
-FROM alpine:3.11.6
+FROM phusion/baseimage:0.11
 LABEL maintainer="github.com/subspacecommunity/subspace"
 
 COPY --from=build  /src/subspace-linux-amd64 /usr/bin/subspace
@@ -30,12 +30,10 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN chmod +x /usr/bin/subspace /usr/local/bin/entrypoint.sh
 
-RUN apk add --no-cache \
-    iproute2 \
-    iptables \ 
-    dnsmasq \
-    socat 
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y iproute2 iptables dnsmasq socat 
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh" ]
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
 CMD [ "/sbin/my_init" ]
